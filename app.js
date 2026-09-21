@@ -19,8 +19,6 @@ async function chamarGemini(promptTexto) {
     if (!apiKey) { alert("Salve a chave API primeiro."); return; }
     
     const chaveLimpa = apiKey.trim();
-    
-    // MUDANÇA: URL configurada exatamente para o modelo Gemini 3.5 Flash Lite
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${chaveLimpa}`;
     
     try {
@@ -33,7 +31,7 @@ async function chamarGemini(promptTexto) {
         if (!response.ok) {
             const erroDetalhado = await response.json();
             console.error("Detalhes do erro:", erroDetalhado);
-            return `Erro ${response.status}: ${erroDetalhado.error?.message || "Verifique o console"}`;
+            return `Erro ${response.status}:${erroDetalhado.error?.message || "Verifique o console"}`;
         }
         
         const data = await response.json();
@@ -49,7 +47,7 @@ async function iniciarEstudo() {
     document.getElementById("leitura-area").style.display = "block";
     document.getElementById("texto-exibicao").innerText = "Buscando o texto...";
 
-    const prompt = `Traga o texto exato da Bíblia (King James Atualizada) da referência: ${ref}. Abaixo, dê uma explicação simples do contexto e uso prático.`;
+    const prompt = `Traga o texto exato da Bíblia (King James Atualizada) da referência: ${ref}. Abaixo, dê uma explicação simples do contexto e uso prático. Responda de forma limpa, sem usar asteriscos, cercilhas ou marcações de texto.`;
     textoAtual = await chamarGemini(prompt);
     
     document.getElementById("texto-exibicao").innerText = textoAtual;
@@ -58,7 +56,11 @@ async function iniciarEstudo() {
 
 function falar(texto) {
     synth.cancel();
-    const utterThis = new SpeechSynthesisUtterance(texto);
+    
+    // LIMPEZA DE ÁUDIO: Remove asteriscos, cercilhas e outros símbolos para que a voz não os leia
+    let textoLimpo = texto.replace(/[*#_`\[\]]/g, '');
+    
+    const utterThis = new SpeechSynthesisUtterance(textoLimpo);
     utterThis.lang = 'pt-BR';
     
     const vozGoogle = vozesDisponiveis.find(voz => voz.name.includes('Google') && voz.lang === 'pt-BR');
@@ -81,7 +83,7 @@ async function tirarDuvida() {
     if(!duvida) return;
     
     document.getElementById("texto-exibicao").innerText = "Pensando na resposta...";
-    const prompt = `O usuário lê: "${textoAtual}". Dúvida: "${duvida}". Responda de forma curta, direta e com exemplo prático.`;
+    const prompt = `O usuário lê: "${textoAtual}". Dúvida: "${duvida}". Responda de forma curta, direta e com exemplo prático. Não utilize asteriscos ou cercilhas.`;
     const resposta = await chamarGemini(prompt);
     
     document.getElementById("texto-exibicao").innerText = "RESPOSTA:\n" + resposta + "\n\n--- TEXTO ORIGINAL ---\n" + textoAtual;
