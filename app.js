@@ -12,16 +12,16 @@ if(apiKey) document.getElementById("api-key").value = apiKey;
 function salvarChave() {
     apiKey = document.getElementById("api-key").value;
     localStorage.setItem("gemini_api_key", apiKey);
-    alert("Chave guardada com sucesso!");
+    alert("Chave salva com sucesso!");
 }
 
 async function chamarGemini(promptTexto) {
-    if (!apiKey) { alert("Guarde a chave API primeiro."); return; }
+    if (!apiKey) { alert("Salve a chave API primeiro."); return; }
     
     const chaveLimpa = apiKey.trim();
     
-    // MUDANÇA: A utilizar o modelo universal "gemini-pro"
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${chaveLimpa}`;
+    // MUDANÇA: URL configurada exatamente para o modelo Gemini 3.5 Flash Lite
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${chaveLimpa}`;
     
     try {
         const response = await fetch(url, {
@@ -33,13 +33,13 @@ async function chamarGemini(promptTexto) {
         if (!response.ok) {
             const erroDetalhado = await response.json();
             console.error("Detalhes do erro:", erroDetalhado);
-            return `Erro ${response.status}: ${erroDetalhado.error?.message || "Verifique a consola"}`;
+            return `Erro ${response.status}: ${erroDetalhado.error?.message || "Verifique o console"}`;
         }
         
         const data = await response.json();
         return data.candidates[0].content.parts[0].text;
     } catch (e) { 
-        return "Erro na ligação à internet ou bloqueio no navegador."; 
+        return "Erro na conexão com a internet ou bloqueio no navegador."; 
     }
 }
 
@@ -47,7 +47,7 @@ async function iniciarEstudo() {
     const ref = document.getElementById("referencia").value;
     if(!ref) return;
     document.getElementById("leitura-area").style.display = "block";
-    document.getElementById("texto-exibicao").innerText = "A procurar o texto...";
+    document.getElementById("texto-exibicao").innerText = "Buscando o texto...";
 
     const prompt = `Traga o texto exato da Bíblia (King James Atualizada) da referência: ${ref}. Abaixo, dê uma explicação simples do contexto e uso prático.`;
     textoAtual = await chamarGemini(prompt);
@@ -80,8 +80,8 @@ async function tirarDuvida() {
     const duvida = document.getElementById("duvida-input").value;
     if(!duvida) return;
     
-    document.getElementById("texto-exibicao").innerText = "A pensar na resposta...";
-    const prompt = `O utilizador lê: "${textoAtual}". Dúvida: "${duvida}". Responda de forma curta, direta e com exemplo prático.`;
+    document.getElementById("texto-exibicao").innerText = "Pensando na resposta...";
+    const prompt = `O usuário lê: "${textoAtual}". Dúvida: "${duvida}". Responda de forma curta, direta e com exemplo prático.`;
     const resposta = await chamarGemini(prompt);
     
     document.getElementById("texto-exibicao").innerText = "RESPOSTA:\n" + resposta + "\n\n--- TEXTO ORIGINAL ---\n" + textoAtual;
