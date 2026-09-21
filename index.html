@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor IA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <h1>Tutor Inteligente</h1>
+        
+        <div class="card" id="config-section">
+            <p>1. Chave da API (Salva no aparelho):</p>
+            <input type="password" id="api-key" placeholder="Sua Chave API (AI Studio)">
+            <button onclick="salvarChave()">Salvar Chave</button>
+        </div>
+
+        <div class="card" id="study-section">
+            <p>2. Digite a referência:</p>
+            <input type="text" id="referencia" placeholder="Ex: Provérbios 3:1-5">
+            <button onclick="iniciarEstudo()">Buscar e Narrar</button>
+        </div>
+
+        <div class="card" id="leitura-area" style="display:none;">
+            <div class="controles">
+                <button onclick="pausarLeitura()" class="btn-secundario">Pausar</button>
+                <button onclick="retomarLeitura()" class="btn-secundario">Retomar</button>
+            </div>
+            
+            <p id="texto-exibicao">Aguarde...</p>
+            
+            <div class="duvida-section">
+                <p>Dúvida sobre o texto lido:</p>
+                <input type="text" id="duvida-input" placeholder="O que isso quer dizer?">
+                <button onclick="tirarDuvida()">Explicar Dúvida</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
