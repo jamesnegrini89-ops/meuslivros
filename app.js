@@ -18,10 +18,10 @@ function salvarChave() {
 async function chamarGemini(promptTexto) {
     if (!apiKey) { alert("Salve a chave API primeiro."); return; }
     
-    // A MÁGICA AQUI: .trim() remove espaços invisíveis copiados sem querer
     const chaveLimpa = apiKey.trim();
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${chaveLimpa}`;
+    // CORREÇÃO: Adicionado "-latest" no nome do modelo para o Google reconhecer
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${chaveLimpa}`;
     
     try {
         const response = await fetch(url, {
@@ -30,11 +30,10 @@ async function chamarGemini(promptTexto) {
             body: JSON.stringify({ contents: [{ parts: [{ text: promptTexto }] }] })
         });
         
-        // Se der erro, agora o aplicativo vai nos mostrar exatamente qual foi!
         if (!response.ok) {
             const erroDetalhado = await response.json();
-            console.error("Detalhes do erro do Google:", erroDetalhado);
-            return `Erro ${response.status}: ${erroDetalhado.error?.message || "Verifique o console (F12)"}`;
+            console.error("Detalhes do erro:", erroDetalhado);
+            return `Erro ${response.status}: ${erroDetalhado.error?.message || "Verifique o console"}`;
         }
         
         const data = await response.json();
