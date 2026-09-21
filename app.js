@@ -2,6 +2,12 @@ let textoAtual = "";
 let synth = window.speechSynthesis;
 let apiKey = localStorage.getItem("gemini_api_key");
 
+// Carrega as vozes do sistema assim que o app abre
+let vozesDisponiveis = [];
+synth.onvoiceschanged = () => {
+    vozesDisponiveis = synth.getVoices();
+};
+
 if(apiKey) document.getElementById("api-key").value = apiKey;
 
 function salvarChave() {
@@ -41,6 +47,19 @@ function falar(texto) {
     synth.cancel();
     const utterThis = new SpeechSynthesisUtterance(texto);
     utterThis.lang = 'pt-BR';
+    
+    // A MÁGICA DO PLANO A / PLANO B:
+    // Tenta encontrar a voz de alta qualidade do Google (Plano A)
+    const vozGoogle = vozesDisponiveis.find(voz => voz.name.includes('Google') && voz.lang === 'pt-BR');
+    
+    if (vozGoogle) {
+        utterThis.voice = vozGoogle; // Usa a IA do Google
+    } else {
+        // Se não achar, procura qualquer outra voz em Português do aparelho (Plano B)
+        const vozLocal = vozesDisponiveis.find(voz => voz.lang === 'pt-BR' || voz.lang === 'pt-PT');
+        if(vozLocal) utterThis.voice = vozLocal;
+    }
+
     synth.speak(utterThis);
 }
 
