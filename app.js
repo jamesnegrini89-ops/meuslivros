@@ -20,8 +20,8 @@ async function chamarGemini(promptTexto) {
     
     const chaveLimpa = apiKey.trim();
     
-    // URL correto para o modelo oficial e suportado
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${chaveLimpa}`;
+    // MUDANÇA: A utilizar o modelo universal "gemini-pro"
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${chaveLimpa}`;
     
     try {
         const response = await fetch(url, {
