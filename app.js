@@ -20,8 +20,8 @@ async function chamarGemini(promptTexto) {
     
     const chaveLimpa = apiKey.trim();
     
-    // CORREÇÃO: Adicionado "-latest" no nome do modelo para o Google reconhecer
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${chaveLimpa}`;
+    // MUDANÇA: URL atualizada para o modelo Gemini 3.1 Flash Lite
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${chaveLimpa}`;
     
     try {
         const response = await fetch(url, {
