@@ -2,7 +2,6 @@ let textoAtual = "";
 let synth = window.speechSynthesis;
 let apiKey = localStorage.getItem("gemini_api_key");
 
-// Carrega as vozes do sistema assim que o app abre
 let vozesDisponiveis = [];
 synth.onvoiceschanged = () => {
     vozesDisponiveis = synth.getVoices();
@@ -18,16 +17,31 @@ function salvarChave() {
 
 async function chamarGemini(promptTexto) {
     if (!apiKey) { alert("Salve a chave API primeiro."); return; }
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    
+    // A MÁGICA AQUI: .trim() remove espaços invisíveis copiados sem querer
+    const chaveLimpa = apiKey.trim();
+    
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${chaveLimpa}`;
+    
     try {
         const response = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ contents: [{ parts: [{ text: promptTexto }] }] })
         });
+        
+        // Se der erro, agora o aplicativo vai nos mostrar exatamente qual foi!
+        if (!response.ok) {
+            const erroDetalhado = await response.json();
+            console.error("Detalhes do erro do Google:", erroDetalhado);
+            return `Erro ${response.status}: ${erroDetalhado.error?.message || "Verifique o console (F12)"}`;
+        }
+        
         const data = await response.json();
         return data.candidates[0].content.parts[0].text;
-    } catch (e) { return "Erro na conexão com o Gemini."; }
+    } catch (e) { 
+        return "Erro na conexão com a internet ou bloqueio no navegador."; 
+    }
 }
 
 async function iniciarEstudo() {
@@ -48,14 +62,10 @@ function falar(texto) {
     const utterThis = new SpeechSynthesisUtterance(texto);
     utterThis.lang = 'pt-BR';
     
-    // A MÁGICA DO PLANO A / PLANO B:
-    // Tenta encontrar a voz de alta qualidade do Google (Plano A)
     const vozGoogle = vozesDisponiveis.find(voz => voz.name.includes('Google') && voz.lang === 'pt-BR');
-    
     if (vozGoogle) {
-        utterThis.voice = vozGoogle; // Usa a IA do Google
+        utterThis.voice = vozGoogle; 
     } else {
-        // Se não achar, procura qualquer outra voz em Português do aparelho (Plano B)
         const vozLocal = vozesDisponiveis.find(voz => voz.lang === 'pt-BR' || voz.lang === 'pt-PT');
         if(vozLocal) utterThis.voice = vozLocal;
     }
